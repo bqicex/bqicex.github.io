@@ -11,7 +11,6 @@ p {
     font-size: 24px;
     font-family: 'Courier New', Courier, monospace;
     text-align: left;
-    margin-top: 20%;
 }
 
 img{
@@ -20,7 +19,21 @@ img{
     margin-left: auto;
     margin-right: auto;
     width: 50%;
+  transform: rotate(0deg);
+  animation: rotate 1s infinite;
 }
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(360deg);
+  }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
 
 table {
     margin-left: auto;
