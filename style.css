@@ -29,7 +29,7 @@ img{
     margin-right: auto;
     width: 50%;
   transform: rotate(0deg);
-  animation: rotate 5s linear infinite;
+  animation: rotate 60s linear infinite;
 }
 @keyframes rotate {
   0% {
