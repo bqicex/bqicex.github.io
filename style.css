@@ -2,7 +2,7 @@ body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background-color: #ffffff;
-    animation: spin-left 120s linear infinite;
+    animation: spin-left 960s linear infinite;
 }
 @keyframes spin-left {
   from {
