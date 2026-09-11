@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Cents Playback</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #cfffce;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: rgb(0, 0, 0);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-play {
+      background: #44ffff;
+      color: rgb(0, 0, 0);
+    }
+
+    .btn-play:hover {
+      background: rgb(0, 146, 165);
+    }
+
+    .btn-play:active {
+      transform: scale(0.55);
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .note-btn {
+      padding: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 2px solid #444;
+      background: #ffa2a2;
+      color: rgb(0, 0, 0);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .note-btn:hover {
+      border-color: #667eea;
+      background: #333;
+    }
+
+    .note-btn:active {
+      transform: scale(0.95);
+      background: #667eea;
+      border-color: #667eea;
+    }
+
+    .info {
+      background: #2a2a2a;
+      color: #aaa;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 2rem;
+    }
+
+    .info code {
+      background: #1a1a1a;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #667eea;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Some scales from Ellis 1885</h1>
+
+    <div class="controls">
+      <button class="btn-play" id="playBtn">Play</button>
+    </div>
+
+    <div style="background: #2a2a2a; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+      <p style="color: #aaa; font-size: 12px; margin-bottom: 0.5rem;">Select Scale then press play:</p>
+      <div class="button-grid" id="presetGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============ EDIT THIS SECTION ============
+    // Define your scales as presets
+    // Each preset has a name, cents array, and labels array
+    const SCALES = {
+      '12TET': {
+        cents: [0, 200, 200, 100, 200, 200, 200, 100],
+      },
+      'Ellis-Greek (492-1)': {
+        cents: [0, 204, 204, 90, 204, 204, 204, 90],
+      },
+      'Ellis-Helmholtz (492-2)': {
+        cents: [0, 204, 182, 112, 204, 182, 204, 112],
+      },
+      'Ellis-Meantone-Major (492-3)': {
+        cents: [0, 193, 193, 119, 194, 193, 193, 117],
+      },
+      'Ellis-Lute-Scale (493-1)': {
+        cents: [0, 204, 90, 114, 90, 204, 90, 114, 90, 204],
+      },
+      'Ellis-Al-Farabi (493-2)': {
+        cents: [0, 204, 151, 143, 204, 151, 143, 204],
+      },
+      'Ellis-Rast (496)': {
+        cents: [0, 204, 180, 114, 204, 180, 114, 204],
+      },
+      'Ellis-Iraq (496)': {
+        cents: [0, 180, 204, 114, 180, 204, 114, 180, 24],
+      },
+      'Ellis-Highland-Bagpipe (498)': {
+        cents: [0, 204, 151, 143, 204, 151, 143, 204],
+      },
+      'Ellis-Indian-Old-C (501)': {
+        cents: [0, 204, 182, 112, 204, 204, 182, 112],
+      },
+      'Ellis-Singapore (505)': {
+        cents: [0, 169, 181, 193, 166, 185, 146, 165],
+      },
+      'Ellis-Singapore-Tempered: (505)': {
+        cents: [0, 150, 200, 200, 150, 200, 150, 150],
+      },
+      'Ellis-Burmah-Patala (506)': {
+        cents: [0, 176, 174, 183, 174, 192, 154, 183],
+      },
+      'Ellis,Burmah-Balafong (506)': {
+        cents: [0, 114, 236, 200, 137, 151, 194, 164],
+      },
+      'Ellis-tempered-Burmah-Balafong (506)': {
+        cents: [0, 100, 250, 200, 150, 150, 200, 150],
+      },
+      'Ellis,Burmah-Balafong-2 (506)': {
+        cents: [0, 114, 236, 156, 147, 154, 208, 181],
+      },
+      'Ellis-Siam-Ranat (506)': {
+        cents: [0, 129, 148, 231, 218, 45, 258, 225, 201, 103],
+      },
+      'Ellis-Western-Africa-Balafong (207):': {
+        cents: [0, 152, 135, 245, 191, 166, 149, 161, 152],
+      },
+      'Pentatonic-Scale': {
+        cents: [0, 200, 300, 200, 200],
+      },
+      'Ellis-South-Pacific': {
+        cents: [0, 202, 168, 315, 218, 290],
+      },
+      'Ellis-Java-Notes (510)': {
+        cents: [0, 228, 256, 244, 232, 240],
+      },
+      'Ellis-Chinese (515)': {
+        cents: [0, 204, 204, 294, 204, 294],
+      },
+      'Ellis-Dizi (516)': {
+        cents: [0, 178, 270, 214, 226, 308],
+      },
+      'Ellis-Suo-na (516)': {
+        cents: [0, 145, 152, 143, 197, 176, 201, 202],
+      },
+      'Ellis-Sheng (517)': {
+        cents: [0, 210, 128, 160, 217, 193, 132, 159, 214, 151, 182],
+      },
+      'Ellis-Biwa-Sum (520)': {
+        cents: [0, 214, 114, 89, 85],
+      },
+      'Ellis-Isawa-Koto (522)': {
+        cents: [0, 204, 112, 386, 112, 386],
+      },
+      'Ellis-Koto-women (522)': {
+        cents: [0, 193, 164, 362, 82, 398],
+      },
+      'Ellis-Koto-master (522)': {
+        cents: [0, 185, 152, 346, 107, 410],
+      }
+    };
+    // Build cumulative sums for each scale's cents array
+
+    const CumScales = {};
+    for (const scaleName in SCALES) {
+      let runningSum = 0;
+      CumScales[scaleName] = SCALES[scaleName].cents.map(cents => runningSum += cents);
+    }   
+    
+    // ==========================================
+
+    const BASE_FREQ = 261.63;
+    const NOTE_DURATION = 0.5;
+
+    let audioContext;
+    let currentOscillator = null;
+    let currentGain = null;
+    let currentScale = 'Ellis-Greek';
+    let playbackTimer = null;
+
+    // Initialize Audio Context
+    function initAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioContext;
+    }
+
+    // Convert cents to frequency
+    function centsToFrequency(cents) {
+      return BASE_FREQ * Math.pow(2, cents / 1200);
+    }
+
+    // Play a tone
+    function playTone(cents) {
+      initAudioContext();
+      stopTone();
+
+      const frequency = centsToFrequency(cents);
+
+      currentOscillator = audioContext.createOscillator();
+      currentGain = audioContext.createGain();
+
+      currentOscillator.connect(currentGain);
+      currentGain.connect(audioContext.destination);
+
+      currentOscillator.type = 'sine';
+      currentOscillator.frequency.value = frequency;
+      currentGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+      currentGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + NOTE_DURATION);
+
+      currentOscillator.start(audioContext.currentTime);
+      currentOscillator.stop(audioContext.currentTime + NOTE_DURATION);
+    }
+
+    // Stop current tone
+    function stopTone() {
+      if (playbackTimer) {
+        clearTimeout(playbackTimer);
+        playbackTimer = null;
+      }
+      if (currentOscillator) {
+        try {
+          currentOscillator.stop();
+        } catch (e) { }
+        currentOscillator = null;
+      }
+      if (currentGain) {
+        currentGain = null;
+      }
+    }
+
+    // Create preset buttons
+    function createPresetButtons() {
+      const grid = document.getElementById('presetGrid');
+      grid.innerHTML = '';
+
+      Object.keys(CumScales).forEach(presetName => {
+        const button = document.createElement('button');
+        button.className = 'note-btn';
+        button.textContent = presetName;
+        if (presetName === currentScale) {
+          button.style.background = '#667eea';
+          button.style.borderColor = '#667eea';
+        }
+        button.addEventListener('click', () => {
+          currentScale = presetName;
+          createPresetButtons();
+        });
+        grid.appendChild(button);
+      });
+    }
+
+    // Play the selected scale from start to finish
+    function playScale() {
+      stopTone();
+      const scale = CumScales[currentScale];
+      let index = 0;
+
+      function playNext() {
+        if (index >= scale.length) {
+          playbackTimer = null;
+          return;
+        }
+        playTone(scale[index++]);
+        playbackTimer = setTimeout(playNext, NOTE_DURATION * 1000);
+      }
+
+      playNext();
+    }
+
+    document.getElementById('playBtn').addEventListener('click', playScale);
+
+    // Initialize on page load
+    createPresetButtons();
+  </script>
+</body>
+
+</html>
