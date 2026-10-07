@@ -158,6 +158,35 @@
             display: inline-block;
             margin: 2px 6px 2px 0;
         }
+
+        #videoInfo {
+            position: fixed;
+            right: 12px;
+            bottom: 12px;
+            width: min(360px, calc(100% - 24px));
+            padding: 10px 14px;
+            background: #fff;
+            border: 1px solid var(--border);
+            z-index: 9;
+        }
+
+        #videoInfo h2 {
+            margin: 0 0 8px;
+            font-size: 1em;
+        }
+
+        #videoInfo .video {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 0;
+        }
+
+        #videoInfo a {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
     </style>
 
     <script src="verovio-toolkit-wasm.js" defer></script>
@@ -262,7 +291,8 @@
             reh1: ["reh1"],
             reh2: ["reh2"],
             reh3: ["reh3"],
-            reh4: ["reh4"]
+            reh4: ["reh4"],
+            reh5: ["reh5"],
         };
 
         const groupInfo = {
@@ -285,7 +315,7 @@
                 description: "<p style=\"color:blue\"> Ostinato cycle 6. </p>",
             },
             bassoonbass7: {
-                description: "<span style=\"color:blue\"> Ostinato cycle 7. </span>Because of the 3/4 measure, the 18 beat cycle aligns with the meter.",
+                description: "<span style=\"color:blue\"> Ostinato cycle 7. </span>Because of the 3/4 measure, this 18 beat cycle aligns with the meter.",
             },
             bassoonbass8: {
                 description: "<span style=\"color:blue\"> Ostinato cycle 8 </span> is truncated from length 18 to 8, aligning metrically with the measure.",
@@ -303,13 +333,16 @@
                 description: "A simple diatonic sequence in basson 1, but Stravinsky alters its regularity by taking away a beat in m.9.",
             },
             bassoonmel3: {
-                description: "Return to the opening theme, but its changed relation with the ostinato, combined with the semi-cadential figure, suggests now G major.",
+                description: "The return to the opening theme. Its changed relation with the ostinato, combined with the semi-cadential figure, suggests now G major.",
             },
             reh3: {
                 description: "Now the contrapunctal relationship is reversed, with the counterpoint moving at twice the rate of the ostinato.",
             },
             reh4: {
                 description: "Could this be a V-I cadence in G? Certainlly there are hints, but the ostinato always foils any sense of tonal stability.",
+            },
+            reh5: {
+                description: "Due to the way Stravinsky sets up his ostinato, we actually get the same characteristic tritone between C and F# even though the melody starts a bar late.",
             }
         };
 
@@ -405,6 +438,7 @@
             close.type = "button";
             close.title = "Close (Esc)";
             close.id = "infoClose";
+            aside.append(close);
 
             if (info.description) aside.append(makeMarkup("div", info.description));
 
@@ -441,7 +475,10 @@
         function onBassoonbass6Click(noteId, event) { }
         function onBassoonbass7Click(noteId, event) { }
         function onBassoonbass8Click(noteId, event) { }
-        function onbassoonmel2Click(noteId, event) { }
+        function onbassoonmel2Click(noteId, event, container, actions) {
+            actions.addHarm("!", "n1eizeh7", "above");
+            actions.addHarm("!", "n1ej063c", "above");
+         }
         function onBassoonmel3Click(noteId, event) { }
         function onReh1Click(noteId, event, container, actions) {
             actions.addGliss("n5qy8nc", "nrvlpmm");
@@ -462,21 +499,27 @@
         }
         function onReh3Click(noteId, event, container, actions) {
             actions.highlightNotes(["n11xnsak", "n1y25awr", "n14ef4yt", "nn07mog",
-                "n13jaowo", "nz66327", "nhijk9w", "n1wlzql8"
+                "n13jaowo", "nz66327", "nhijk9w", "n1wlzql8", "n4lbj9w", "nw9j5wj"
             ]);
             actions.addGliss("n11xnsak", "n1y25awr");
             actions.addGliss("n1y25awr", "n14ef4yt");
             actions.addGliss("n14ef4yt", "nn07mog");
+            actions.addGliss("nn07mog", "nw9j5wj");
             actions.addGliss("n13jaowo", "nz66327");
             actions.addGliss("nz66327", "nhijk9w");
             actions.addGliss("nhijk9w", "n1wlzql8");
+            actions.addGliss("n1wlzql8", "n4lbj9w");
             actions.addHarm("4♯", "n11xnsak");
             actions.addHarm("5", "n1y25awr");
             actions.addHarm("6", "n14ef4yt");
             actions.addHarm("7", "nn07mog");
+            actions.addHarm("8", "nw9j5wj");
         }
         function onReh4Click(noteId, event, container, actions) {
             actions.highlightNotes(["n1czergm", "nw9j5wj", "nz66327", "n4lbj9w"]);
+        }
+        function onReh5Click(noteId, event, container, actions) {
+            actions.highlightNotes(["n1a82ir9", "n1m905qn", "nryu3c", "nvm868a", "n1440oyx", "nj8gt95", "nie3ge6"]);
         }
 
         const groupClickHandlers = {
@@ -493,7 +536,8 @@
             reh1: onReh1Click,
             reh2: onReh2Click,
             reh3: onReh3Click,
-            reh4: onReh4Click
+            reh4: onReh4Click,
+            reh5: onReh5Click
         };
 
         function onNoteClick(noteId, groupName, event, container, actions) {
@@ -505,7 +549,7 @@
             let dragState = null;
 
             aside.addEventListener("pointerdown", (e) => {
-                if (e.button !== 0 || e.target.closest("button, summary, a, input, select, textarea")) {
+                if (e.button !== 0 || e.target.closest("button, summary, a, input, select, textarea, iframe")) {
                     return;
                 }
 
@@ -640,7 +684,11 @@
                     scheduleRefresh();
                 }
 
-                function addHarm(text, targetId) {
+                function addHarm(text, targetId, placement = "below") {
+                    if (placement !== "above" && placement !== "below") {
+                        console.error(`Cannot add harm: placement must be "above" or "below" (received "${placement}").`);
+                        return;
+                    }
                     const targetRef = targetId.replace(/^#/, "");
                     const parser = new DOMParser();
                     const document = parser.parseFromString(mei, "application/xml");
@@ -659,7 +707,8 @@
                     const existingHarm = [...document.getElementsByTagName("harm")]
                         .find(harm =>
                             harm.getAttribute("startid") === `#${targetRef}` &&
-                            harm.textContent === text);
+                            harm.textContent === text &&
+                            harm.getAttribute("place") === placement);
                     if (existingHarm) return;
 
                     let harmId;
@@ -673,8 +722,8 @@
                     );
                     harm.setAttribute("xml:id", harmId);
                     harm.setAttribute("startid", `#${targetRef}`);
-                    harm.setAttribute("place", "below");
-                    harm.setAttribute("vo", "-4");
+                    harm.setAttribute("place", placement);
+                    harm.setAttribute("vo", placement === "above" ? "3" : "-4");
                     harm.setAttribute("ho", "-1");
                     harm.setAttribute("color", "red");
                     harm.textContent = text;
@@ -790,6 +839,15 @@
     </div>
     <div id="notation1"></div>
     <aside id="info" hidden></aside>
+    <aside id="videoInfo">
+        <iframe
+            class="video"
+            src="https://www.youtube.com/embed/GC6CpS7OPow"
+            title="Performance video"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+    </aside>
 </body>
 
 </html>

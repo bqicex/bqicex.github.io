@@ -186,6 +186,7 @@
                            <rest xml:id="r7pptpx" type="mscore-beam-none" dur="16" />
                         </layer>
                      </staff>
+                     <trill xml:id="tr1" tstamp="1.0" staff="2"/>
                      <reh xml:id="reh1" tstamp="1" staff="2" place="above">
                         <rend color="orange">(⌐■_■)</rend>
                      </reh>
@@ -216,6 +217,7 @@
                            <rest xml:id="r1n422at" type="mscore-beam-none" dur="16" />
                         </layer>
                      </staff>
+                     <trill xml:id="tr1" tstamp="1.0" staff="2"/>
                      <reh xml:id="reh2" tstamp="1.5" staff="2" place="above">
                         <rend color="orange">(⌐■_■)</rend>
                      </reh>
@@ -428,6 +430,9 @@
                            </beam>
                         </layer>
                      </staff>
+                     <reh xml:id="reh5" tstamp="2" staff="2" place="below" vo="-4.5">
+                        <rend color="orange">(⌐■_■)</rend>
+                     </reh>
                      <staff xml:id="m12s3" n="3">
                         <layer xml:id="m12s3l1" n="1">
                            <beam xml:id="beam39">
@@ -461,7 +466,7 @@
                      <staff xml:id="m13s2" n="2">
                         <layer xml:id="m13s2l1" n="1">
                            <beam xml:id="beam43">
-                              <note xml:id="n3eqevd" dur="8" pname="f" oct="3" />
+                              <note xml:id="n3eqevd" dur="8" pname="f" oct="3" accid="n"/>
                               <note xml:id="n14kk59j" dur="16" pname="f" oct="3" />
                               <note xml:id="nrue8cq" dur="16" pname="g" oct="3" />
                            </beam>
@@ -503,12 +508,13 @@
                      </staff>
                      <staff xml:id="m14s2" n="2">
                         <layer xml:id="m14s2l1" n="1">
-                           <note xml:id="ntnng1r" dur="4" pname="g" oct="3" />
+                           <note xml:id="ntnng1r" dur="4" pname="g" oct="3" accid="s"/>
                            <note xml:id="n1lysudb" dur="16" pname="a" oct="3" />
                            <rest xml:id="r1omvmj8" type="mscore-beam-none" dur="16" />
                            <rest xml:id="r14k06u8" type="mscore-beam-none" dur="8" />
                         </layer>
                      </staff>
+                     <trill xml:id="tr2" tstamp="1.0" staff="2"/>
                      <staff xml:id="m14s3" n="3">
                         <layer xml:id="m14s3l1" n="1">
                            <beam xml:id="beam49">
@@ -547,6 +553,7 @@
                            <rest xml:id="r1rv86vy" type="mscore-beam-none" dur="8" />
                         </layer>
                      </staff>
+                     <trill xml:id="tr3" tstamp="1.0" staff="2"/>
                      <staff xml:id="m15s3" n="3">
                         <layer xml:id="m15s3l1" n="1">
                            <beam xml:id="beam53">
@@ -620,6 +627,7 @@
                            </beam>
                         </layer>
                      </staff>
+                     <tie startid="#nxo6lwc" endid="#n1ey6fu4" />
                      <staff xml:id="m17s2" n="2">
                         <layer xml:id="m17s2l1" n="1">
                            <note xml:id="niwserq" dur="8" pname="a" oct="4" />
@@ -656,7 +664,6 @@
                      <staff xml:id="m18s2" n="2">
                         <layer xml:id="m18s2l1" n="1">
                            <note xml:id="npirkfv" dots="1" dur="4" pname="g" oct="3">
-                              <accid xml:id="a1nvt41y" accid="s" />
                            </note>
                            <note xml:id="n1wt8zvg" dur="8" pname="g" oct="4">
                               <accid xml:id="a1u2i40a" accid="n" />
@@ -694,6 +701,7 @@
                            </beam>
                         </layer>
                      </staff>
+                     <tie xml:id="tiea" startid="#n10dp7t6" endid="#n1pbph42" />
                      <staff xml:id="m19s2" n="2">
                         <layer xml:id="m19s2l1" n="1">
                            <note xml:id="n196qvao" dur="8" pname="g" oct="4" />
@@ -729,7 +737,6 @@
                         <layer xml:id="m20s2l1" n="1">
                            <beam xml:id="beam72">
                               <note xml:id="n1pbph42" dur="8" pname="f" oct="3">
-                                 <accid xml:id="a1v9bd1j" accid="s" />
                               </note>
                               <note xml:id="n12qm1vg" dur="16" pname="g" oct="4" />
                               <note xml:id="n3l68mz" dur="16" pname="f" oct="4">
@@ -867,7 +874,7 @@
                      <staff xml:id="m24s2" n="2">
                         <layer xml:id="m24s2l1" n="1">
                            <beam xml:id="beam88">
-                              <note xml:id="n11up086" dur="8" pname="f" oct="3" />
+                              <note xml:id="n11up086" dur="8" pname="f" oct="3" accid="n"/>
                               <note xml:id="n1eyco20" dur="8" pname="d" oct="4" />
                            </beam>
                            <beam xml:id="beam89">
@@ -877,6 +884,7 @@
                            </beam>
                         </layer>
                      </staff>
+                     <tie xml:id="tiey3" startid="#n1eyco20" endid="#n7ra87a" />
                      <staff xml:id="m24s3" n="3">
                         <layer xml:id="m24s3l1" n="1">
                            <beam xml:id="beam90">
@@ -909,9 +917,11 @@
                               <note xml:id="n7tb581" dur="16" pname="f" oct="3" />
                               <note xml:id="n1nyby4m" dur="16" pname="a" oct="3" />
                            </beam>
+                           <beam>
                            <note xml:id="n1bb5v33" dur="16" pname="d" oct="3" />
                            <rest xml:id="r1p30hdr" type="mscore-beam-none" dur="16" />
                            <note xml:id="n5t2xfz" dur="8" pname="d" oct="4" />
+                           </beam>
                         </layer>
                      </staff>
                      <tie xml:id="tiey2" startid="#n5t2xfz" endid="#n99oro1" />
@@ -1177,7 +1187,6 @@
                      <staff xml:id="m32s2" n="2">
                         <layer xml:id="m32s2l1" n="1">
                            <note xml:id="n7iewqo" dur="4" pname="f" oct="3">
-                              <accid xml:id="a92gq4b" accid="s" />
                            </note>
                            <beam xml:id="beam124">
                               <note xml:id="n1cgxfml" dur="8" pname="e" oct="4" />
@@ -1219,6 +1228,7 @@
                            </beam>
                         </layer>
                      </staff>
+                     <tie xml:id="tie7" startid="#n1echz9z" endid="#n1r3p6ux" />
                      <staff xml:id="m33s3" n="3">
                         <layer xml:id="m33s3l1" n="1">
                            <beam xml:id="beam129">
@@ -1242,7 +1252,6 @@
                         <layer xml:id="m34s2l1" n="1">
                            <beam xml:id="beam131">
                               <note xml:id="n1r3p6ux" dur="8" pname="d" oct="3">
-                                 <accid xml:id="a48eoqb" accid="s" />
                               </note>
                               <note xml:id="n12kfk15" dur="16" pname="a" oct="2" />
                               <note xml:id="n1qviq70" dur="16" pname="c" oct="3" />
