@@ -234,10 +234,31 @@
                 "beam126", "ns1kiq9", "n3yk5ze",
                 "beam129", "n1xr2f9y", "nhr1v0e",
                 "beam130", "n6qh8p1", "nhn7rlg"],
-            bassoonmel1: ["beam22", "nuu8blh", "njbhdfj", "n1eizeh7",
+            bassoonmel1: [
+                "n14fw5tm",
+                "n2qc1nd",
+                "beam3",
+                "n1bey0hk",
+                "n1ii7r3i",
+                "beam4",
+                "n9czj87",
+                "nj8gt95",
+                "n1440oyx"
+            ],
+            bassoonmel2: ["beam22", "nuu8blh", "njbhdfj", "n1eizeh7",
                 "beam23", "nvkxzaj", "n5ih3ee",
                 "beam26", "n1m5cpnl", "n888vv8", "n1ej063c",
                 "nm8da90"],
+            bassoonmel3: [
+                "nw9j5wj",
+                "nzbbgsa",
+                "beam37",
+                "n1q3kqjo",
+                "n1nv1dsd",
+                "beam38",
+                "n104b43s",
+                "nie3ge6"
+            ],
             reh1: ["reh1"],
             reh2: ["reh2"],
             reh3: ["reh3"],
@@ -246,7 +267,7 @@
 
         const groupInfo = {
             bassoonbass: {
-                description: "This ostinato runs throughout the passage, moving from C2 to E3, then descending back down. Its length of 18 quarter notes mean that it takes two cycles before realigning with the barline. <p style=\"color:blue\"> Ostinato cycle 1. </p>",
+                description: "This ostinato runs throughout the passage, moving from C2 to E3, then descending back down. Its length of 18 eighth notes mean that it takes two cycles before realigning with the barline. <p style=\"color:blue\"> Ostinato cycle 1. </p>",
             },
             bassoonbass2: {
                 description: "<p style=\"color:blue\"> Ostinato cycle 2. </p>",
@@ -276,7 +297,13 @@
                 description: "Here, very quickly, we no longer get 'good' counterpoint. The ostinato moves at twice the rate against the baroque melody, creating shrinking intervalic content",
             },
             bassoonmel1: {
+                description: "Upper Voice no.1, not unlike a Trio Sonata. Here, the opening suggests C major with its opening C-G fifth.",
+            },
+            bassoonmel2: {
                 description: "A simple diatonic sequence in basson 1, but Stravinsky alters its regularity by taking away a beat in m.9.",
+            },
+            bassoonmel3: {
+                description: "Return to the opening theme, but its changed relation with the ostinato, combined with the semi-cadential figure, suggests now G major.",
             },
             reh3: {
                 description: "Now the contrapunctal relationship is reversed, with the counterpoint moving at twice the rate of the ostinato.",
@@ -414,7 +441,8 @@
         function onBassoonbass6Click(noteId, event) { }
         function onBassoonbass7Click(noteId, event) { }
         function onBassoonbass8Click(noteId, event) { }
-        function onBassoonmel1Click(noteId, event) { }
+        function onbassoonmel2Click(noteId, event) { }
+        function onBassoonmel3Click(noteId, event) { }
         function onReh1Click(noteId, event, container, actions) {
             actions.addGliss("n5qy8nc", "nrvlpmm");
             actions.addGliss("n1xpln1a", "nvos1o3");
@@ -434,7 +462,7 @@
         }
         function onReh3Click(noteId, event, container, actions) {
             actions.highlightNotes(["n11xnsak", "n1y25awr", "n14ef4yt", "nn07mog",
-            "n13jaowo", "nz66327", "nhijk9w", "n1wlzql8"
+                "n13jaowo", "nz66327", "nhijk9w", "n1wlzql8"
             ]);
             actions.addGliss("n11xnsak", "n1y25awr");
             actions.addGliss("n1y25awr", "n14ef4yt");
@@ -448,7 +476,7 @@
             actions.addHarm("7", "nn07mog");
         }
         function onReh4Click(noteId, event, container, actions) {
-            actions.highlightNotes(["n1czergm","nw9j5wj","nz66327","n4lbj9w"]);
+            actions.highlightNotes(["n1czergm", "nw9j5wj", "nz66327", "n4lbj9w"]);
         }
 
         const groupClickHandlers = {
@@ -460,7 +488,8 @@
             bassoonbass6: onBassoonbass6Click,
             bassoonbass7: onBassoonbass7Click,
             bassoonbass8: onBassoonbass8Click,
-            bassoonmel1: onBassoonmel1Click,
+            bassoonmel2: onbassoonmel2Click,
+            bassoonmel3: onBassoonmel3Click,
             reh1: onReh1Click,
             reh2: onReh2Click,
             reh3: onReh3Click,
@@ -603,7 +632,7 @@
                     gliss.setAttribute("xml:id", glissId);
                     gliss.setAttribute("startid", `#${startRef}`);
                     gliss.setAttribute("endid", `#${endRef}`);
-                    gliss.setAttribute("color" , "red");
+                    gliss.setAttribute("color", "red");
                     measure.insertBefore(gliss, measure.querySelector("reh"));
                     dynamicGlissIds.add(glissId);
 
