@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Score</title>
+    <style>
+        :root {
+            --accent: royalblue;
+            --hover: crimson;
+            --border: black;
+            --muted: green;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 16px 16px 24px;
+            background: white;
+            color: #222;
+        }
+
+        /* ---------- toolbar ---------- */
+        #nav {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        #nav button {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        #nav button:hover:not(:disabled) {
+            background: #eef2ff;
+            border-color: var(--accent);
+        }
+
+        #nav button:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        #pageLabel {
+            min-width: 110px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+
+        /* ---------- score ---------- */
+        #notation1 {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 8px;
+            overflow-x: auto;
+        }
+
+        #notation1 g.note,
+        #notation1 g.reh {
+            cursor: pointer;
+        }
+
+        #notation1 .sel,
+        #notation1 .sel * {
+            fill: var(--accent);
+            stroke: var(--accent);
+        }
+
+        #notation1 .hl,
+        #notation1 .hl * {
+            fill: var(--hover);
+            stroke: var(--hover);
+        }
+
+        #notation1 .note-focus .notehead,
+        #notation1 .note-focus .notehead * {
+            fill: var(--hover) !important;
+            stroke: var(--hover) !important;
+        }
+
+        /* ---------- anchored info panel ---------- */
+        #info {
+            position: fixed;
+            width: min(360px, calc(100% - 24px));
+            max-height: 45vh;
+            overflow-y: auto;
+            padding: 10px 14px;
+            background: #fff;
+            border: 1px solid var(--border);
+            z-index: 10;
+        }
+
+        #info:not([hidden]) {
+            cursor: move;
+        }
+
+        #info[hidden] {
+            display: none;
+        }
+
+        #info .head {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        #info h2 {
+            margin: 0;
+            font-size: 1em;
+        }
+
+        #info .count {
+            color: var(--muted);
+            font-size: 0.8em;
+        }
+
+        #info .close {
+            margin-left: auto;
+            border: none;
+            background: none;
+            font-size: 1.3em;
+            line-height: 1;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        #info .close:hover {
+            color: #000;
+        }
+
+        #info p {
+            margin: 4px 0 0;
+            font-size: 0.9em;
+        }
+
+        #info details {
+            margin-top: 6px;
+            font-size: 0.8em;
+            color: var(--muted);
+        }
+
+        #info summary {
+            cursor: pointer;
+        }
+
+        #info code {
+            display: inline-block;
+            margin: 2px 6px 2px 0;
+        }
+    </style>
+
+    <script src="verovio-toolkit-wasm.js" defer></script>
+    <script>
+        const groups = {
+            bassoonbass: [
+                "n17k11hg", "ntbxnlx", "nrk081b", "nghxuf7",
+                "n12dh0s1", "n1g7j74x", "n16fidfr", "nryu3c",
+                "ncyeajn", "n5q5b9y", "n14lbla5", "nvm868a",
+                "n15xis6t", "n1gxtqiz", "njifihe", "n7nlbym",
+                "n1xpln1a", "n1idqkgh", "beam1", "beam2", "beam5", "beam6", "beam8", "beam9", "beam12", "beam13", "beam14"
+            ],
+            bassoonbass2: [
+                "beam15", "nvos1o3", "nzmqzsj",
+                "beam16", "niuknli", "n1moz6h0",
+                "beam17", "nu3y46", "npwwdgp",
+                "beam20", "n1qssdif", "ncs6l5t",
+                "beam21", "n1nnw1wl", "nj025j5",
+                "beam24", "nnmhn3m", "n1mpxnfd",
+                "beam25", "n1gz9cfz", "n1ap7gih",
+                "beam28", "ngbqbl", "n1dsc3jc",
+                "beam29", "n1r210s4", "npzxe1v"],
+            bassoonbass3: ["beam32", "n13jaowo", "nz66327",
+                "beam33", "nhijk9w", "n1wlzql8",
+                "beam34", "n4lbj9w", "ny66bqi",
+                "beam35", "n1q1o5g1", "n1m905qn",
+                "beam39", "n1gw0tbb", "n1raz81l",
+                "beam40", "nlk59uh", "n1a82ir9",
+                "beam45", "n1b73hlt", "nmjdp06",
+                "beam46", "n1ig4rc7", "nrlxo1m",
+                "beam49", "n1xj5ys7", "nlmilbw"
+            ],
+            bassoonbass4: ["beam50", "n13c1v3m", "n16t18k1",
+                "beam53", "n163oz1u", "n1e5oexe",
+                "beam54", "nryziaf", "ndb2uj5",
+                "beam59", "nr9p971", "nk41f4w",
+                "beam60", "n1gisd9g", "n1thn4h0",
+                "beam63", "n1rsebm2", "n3339xt",
+                "beam64", "njs5agv", "n1cvexsy",
+                "beam66", "nzhaxuk", "nry741p",
+                "beam67", "nxt6zmq", "nostkxn"
+            ],
+            bassoonbass5: ["beam70", "n1s3wyht", "n1h1sr4q",
+                "beam71", "n1778lr8", "n1eg1p3k",
+                "beam74", "n1d33rqq", "n983542",
+                "beam75", "n13td417", "n1o76hw",
+                "beam78", "n1myuajt", "n6uuinh",
+                "beam79", "n1kmp3um", "n1n04tnd",
+                "beam82", "n9f9ws9", "n5dfj52",
+                "beam83", "nlveysg", "n16enkb3",
+                "beam86", "n9c2ghv", "npblm77"
+            ],
+            bassoonbass6: [
+                "beam87", "ngndqn7", "n1jv2nyi",
+                "beam90", "nd8dp03", "n1gt8goz",
+                "beam91", "na0nzmj", "n1mij7wb",
+                "beam94", "ni1lb08", "n15fwmss",
+                "beam95", "njii70j", "n1deomf5",
+                "beam98", "n1x53b6l", "n15crhlt",
+                "beam99", "nqxjrhz", "n1jazhhl",
+                "beam103", "n18lalnc", "n681wk5",
+                "beam104", "njt1gzq", "n1bpnd17"
+            ],
+            bassoonbass7: ["beam107", "naqfjc9", "n120aptc",
+                "beam108", "n50bdzu", "n1n38ejn",
+                "beam115", "n16l7q33", "n1nzqb8m",
+                "beam116", "n1qp3268", "nah8983",
+                "beam117", "n1x7zgeg", "n1bsp9b0",
+                "beam118", "nfgj59l", "nuqxpbc",
+                "beam119", "n2hn1ih", "n1puxcxa",
+                "beam122", "ndh1i3d", "n1yzmsq3",
+                "beam123", "n1nto50p", "n1eb9htl"],
+            bassoonbass8: ["beam125", "nb6c2mj", "n1v1f6s3",
+                "beam126", "ns1kiq9", "n3yk5ze",
+                "beam129", "n1xr2f9y", "nhr1v0e",
+                "beam130", "n6qh8p1", "nhn7rlg"],
+            bassoonmel1: ["beam22", "nuu8blh", "njbhdfj", "n1eizeh7",
+                "beam23", "nvkxzaj", "n5ih3ee",
+                "beam26", "n1m5cpnl", "n888vv8", "n1ej063c",
+                "nm8da90"],
+            reh1: ["reh1"],
+            reh2: ["reh2"],
+            reh3: ["reh3"],
+            reh4: ["reh4"]
+        };
+
+        const groupInfo = {
+            bassoonbass: {
+                description: "This ostinato runs throughout the passage, moving from C2 to E3, then descending back down. Its length of 18 quarter notes mean that it takes two cycles before realigning with the barline. <p style=\"color:blue\"> Ostinato cycle 1. </p>",
+            },
+            bassoonbass2: {
+                description: "<p style=\"color:blue\"> Ostinato cycle 2. </p>",
+            },
+            bassoonbass3: {
+                description: "<p style=\"color:blue\"> Ostinato cycle 3. </p>",
+            },
+            bassoonbass4: {
+                description: "<p style=\"color:blue\"> Ostinato cycle 4. </p>",
+            },
+            bassoonbass5: {
+                description: "<p style=\"color:blue\"> Ostinato cycle 5. </p>",
+            },
+            bassoonbass6: {
+                description: "<p style=\"color:blue\"> Ostinato cycle 6. </p>",
+            },
+            bassoonbass7: {
+                description: "<span style=\"color:blue\"> Ostinato cycle 7. </span>Because of the 3/4 measure, the 18 beat cycle aligns with the meter.",
+            },
+            bassoonbass8: {
+                description: "<span style=\"color:blue\"> Ostinato cycle 8 </span> is truncated from length 18 to 8, aligning metrically with the measure.",
+            },
+            reh1: {
+                description: "Here, the counterpoint is good second species with contrary motion 3-6, suggesting V-I6 in A minor.",
+            },
+            reh2: {
+                description: "Here, very quickly, we no longer get 'good' counterpoint. The ostinato moves at twice the rate against the baroque melody, creating shrinking intervalic content",
+            },
+            bassoonmel1: {
+                description: "A simple diatonic sequence in basson 1, but Stravinsky alters its regularity by taking away a beat in m.9.",
+            },
+            reh3: {
+                description: "Now the contrapunctal relationship is reversed, with the counterpoint moving at twice the rate of the ostinato.",
+            },
+            reh4: {
+                description: "Could this be a V-I cadence in G? Certainlly there are hints, but the ostinato always foils any sense of tonal stability.",
+            }
+        };
+
+        const idToGroup = {};
+        for (const [name, ids] of Object.entries(groups)) {
+            ids.forEach(id => (idToGroup[id] = name));
+        }
+
+        let selectedGroup = null;
+        let selectedElementId = null;
+        let cancelDynamicGliss = null;
+        let highlightedNoteIds = [];
+
+        const findEl = (container, id) => container.querySelector(`[id="${id}"]`);
+
+        function setClass(container, ids, cls, on) {
+            ids.forEach(id => {
+                const el = findEl(container, id);
+                if (el) el.classList.toggle(cls, on);
+            });
+        }
+
+        function highlightNotes(container, ...ids) {
+            const noteIds = ids.flatMap(id => Array.isArray(id) ? id : [id]);
+            clearNoteHighlights(container);
+            highlightedNoteIds = [...noteIds];
+            setClass(container, highlightedNoteIds, "note-focus", true);
+        }
+
+        function clearNoteHighlights(container) {
+            highlightedNoteIds = [];
+            container.querySelectorAll(".note-focus").forEach(el => el.classList.remove("note-focus"));
+        }
+
+        function applySelection(container) {
+            container.querySelectorAll(".sel").forEach(el => el.classList.remove("sel"));
+            if (selectedGroup) {
+                setClass(container, groups[selectedGroup], "sel", true);
+            } else if (selectedElementId) {
+                setClass(container, [selectedElementId], "sel", true);
+            }
+        }
+
+        function clearSelection(container) {
+            selectedGroup = null;
+            selectedElementId = null;
+            cancelDynamicGliss?.();
+            clearNoteHighlights(container);
+            applySelection(container);
+            updateAside(null);
+        }
+
+        function positionAside(aside, anchor) {
+            const gap = 12;
+            const margin = 12;
+            const anchorRect = anchor.getBoundingClientRect();
+            const asideWidth = aside.offsetWidth;
+            const asideHeight = aside.offsetHeight;
+            const left = anchorRect.right + gap + asideWidth <= window.innerWidth - margin
+                ? anchorRect.right + gap
+                : anchorRect.left - asideWidth - gap;
+            const top = anchorRect.top - asideHeight - gap;
+
+            aside.style.left = `${Math.max(margin, Math.min(left, window.innerWidth - asideWidth - margin))}px`;
+            aside.style.top = `${Math.max(margin, Math.min(top, window.innerHeight - asideHeight - margin))}px`;
+        }
+
+        function updateAside(groupName, anchor) {
+            const aside = document.getElementById("info");
+            aside.replaceChildren();
+
+            if (!groupName) {
+                aside.hidden = true;
+                return;
+            }
+
+            const info = groupInfo[groupName] || {};
+            const ids = groups[groupName];
+
+            const make = (tag, text, cls) => {
+                const el = document.createElement(tag);
+                if (text !== undefined) el.textContent = text;
+                if (cls) el.className = cls;
+                return el;
+            };
+            const makeMarkup = (tag, markup, cls) => {
+                const el = make(tag, undefined, cls);
+                el.innerHTML = markup;
+                return el;
+            };
+
+            const close = make("button", "\u00d7", "close");
+            close.type = "button";
+            close.title = "Close (Esc)";
+            close.id = "infoClose";
+
+            if (info.description) aside.append(makeMarkup("div", info.description));
+
+            const details = make("details");
+
+            aside.hidden = false;
+            positionAside(aside, anchor);
+        }
+
+        function onBassoonbassClick(noteId, event, container, actions) {
+            actions.addHarm("1", "n17k11hg");
+            actions.addHarm("2", "ntbxnlx");
+            actions.addHarm("3", "nrk081b");
+            actions.addHarm("4", "nghxuf7");
+            actions.addHarm("5", "n12dh0s1");
+            actions.addHarm("6", "n1g7j74x");
+            actions.addHarm("7", "n16fidfr");
+            actions.addHarm("8", "nryu3c");
+            actions.addHarm("9", "ncyeajn");
+            actions.addHarm("10", "n5q5b9y");
+            actions.addHarm("11", "n14lbla5");
+            actions.addHarm("12", "nvm868a");
+            actions.addHarm("13", "n15xis6t");
+            actions.addHarm("14", "n1gxtqiz");
+            actions.addHarm("15", "njifihe");
+            actions.addHarm("16", "n7nlbym");
+            actions.addHarm("17", "n1xpln1a");
+            actions.addHarm("18", "n1idqkgh");
+        }
+        function onBassoonbass2Click(noteId, event) { }
+        function onBassoonbass3Click(noteId, event) { }
+        function onBassoonbass4Click(noteId, event) { }
+        function onBassoonbass5Click(noteId, event) { }
+        function onBassoonbass6Click(noteId, event) { }
+        function onBassoonbass7Click(noteId, event) { }
+        function onBassoonbass8Click(noteId, event) { }
+        function onBassoonmel1Click(noteId, event) { }
+        function onReh1Click(noteId, event, container, actions) {
+            actions.addGliss("n5qy8nc", "nrvlpmm");
+            actions.addGliss("n1xpln1a", "nvos1o3");
+            actions.highlightNotes(["n5qy8nc", "nrvlpmm", "n1xpln1a", "nvos1o3"]);
+            actions.addHarm("3", "n5qy8nc");
+            actions.addHarm("6", "nrvlpmm");
+        }
+        function onReh2Click(noteId, event, container, actions) {
+            actions.addGliss("n1ir9gvg", "n1rg1rw2");
+            actions.addGliss("n1rg1rw2", "npiy6iq");
+            actions.addGliss("niuknli", "nu3y46");
+            actions.addGliss("nu3y46", "n1qssdif");
+            actions.highlightNotes(["n1ir9gvg", "n1rg1rw2", "niuknli", "nu3y46", "npiy6iq", "n1qssdif"]);
+            actions.addHarm("5", "n1ir9gvg");
+            actions.addHarm("4", "n1rg1rw2");
+            actions.addHarm("3", "npiy6iq");
+        }
+        function onReh3Click(noteId, event, container, actions) {
+            actions.highlightNotes(["n11xnsak", "n1y25awr", "n14ef4yt", "nn07mog",
+            "n13jaowo", "nz66327", "nhijk9w", "n1wlzql8"
+            ]);
+            actions.addGliss("n11xnsak", "n1y25awr");
+            actions.addGliss("n1y25awr", "n14ef4yt");
+            actions.addGliss("n14ef4yt", "nn07mog");
+            actions.addGliss("n13jaowo", "nz66327");
+            actions.addGliss("nz66327", "nhijk9w");
+            actions.addGliss("nhijk9w", "n1wlzql8");
+            actions.addHarm("4♯", "n11xnsak");
+            actions.addHarm("5", "n1y25awr");
+            actions.addHarm("6", "n14ef4yt");
+            actions.addHarm("7", "nn07mog");
+        }
+        function onReh4Click(noteId, event, container, actions) {
+            actions.highlightNotes(["n1czergm","nw9j5wj","nz66327","n4lbj9w"]);
+        }
+
+        const groupClickHandlers = {
+            bassoonbass: onBassoonbassClick,
+            bassoonbass2: onBassoonbass2Click,
+            bassoonbass3: onBassoonbass3Click,
+            bassoonbass4: onBassoonbass4Click,
+            bassoonbass5: onBassoonbass5Click,
+            bassoonbass6: onBassoonbass6Click,
+            bassoonbass7: onBassoonbass7Click,
+            bassoonbass8: onBassoonbass8Click,
+            bassoonmel1: onBassoonmel1Click,
+            reh1: onReh1Click,
+            reh2: onReh2Click,
+            reh3: onReh3Click,
+            reh4: onReh4Click
+        };
+
+        function onNoteClick(noteId, groupName, event, container, actions) {
+            groupClickHandlers[groupName]?.(noteId, event, container, actions);
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const aside = document.getElementById("info");
+            let dragState = null;
+
+            aside.addEventListener("pointerdown", (e) => {
+                if (e.button !== 0 || e.target.closest("button, summary, a, input, select, textarea")) {
+                    return;
+                }
+
+                const rect = aside.getBoundingClientRect();
+                dragState = {
+                    offsetX: e.clientX - rect.left,
+                    offsetY: e.clientY - rect.top,
+                    pointerId: e.pointerId,
+                };
+                aside.setPointerCapture(e.pointerId);
+                aside.style.userSelect = "none";
+            });
+
+            aside.addEventListener("pointermove", (e) => {
+                if (!dragState || e.pointerId !== dragState.pointerId) return;
+
+                const margin = 12;
+                const maxLeft = Math.max(margin, window.innerWidth - aside.offsetWidth - margin);
+                const maxTop = Math.max(margin, window.innerHeight - aside.offsetHeight - margin);
+                const left = Math.min(Math.max(margin, e.clientX - dragState.offsetX), maxLeft);
+                const top = Math.min(Math.max(margin, e.clientY - dragState.offsetY), maxTop);
+                aside.style.left = `${left}px`;
+                aside.style.top = `${top}px`;
+            });
+
+            const stopDragging = (e) => {
+                if (!dragState || e.pointerId !== dragState.pointerId) return;
+                if (aside.hasPointerCapture(e.pointerId)) aside.releasePointerCapture(e.pointerId);
+                aside.style.userSelect = "";
+                dragState = null;
+            };
+
+            aside.addEventListener("pointerup", stopDragging);
+            aside.addEventListener("pointercancel", stopDragging);
+
+            await new Promise(res => {
+                if (verovio.module.calledRun) res();
+                else verovio.module.onRuntimeInitialized = res;
+            });
+
+            const options = { //Verovio Options
+                adjustPageWidth: false,
+                pageHeight: 2000,
+                pageMarginTop: 50,
+                pageWidth: 1500,
+                scale: 40,
+                pageMarginRight: 0,
+                adjustPageHeight: false,
+                breaks: "auto",
+                minLastJustification: 0.8,
+                spacingSystem: 12,
+                footer: "none",
+                systemDivider: "none"
+            };
+
+            async function setupExample(file, notationId) {
+                const tk = new verovio.toolkit();
+                tk.setOptions(options);
+
+                let mei = await (await fetch(file)).text();
+                if (!tk.loadData(mei)) {
+                    console.error(tk.getLog());
+                    return;
+                }
+
+                const container = document.getElementById(notationId);
+                const prevBtn = document.getElementById("prev");
+                const nextBtn = document.getElementById("next");
+                const pageLabel = document.getElementById("pageLabel");
+                let pageCount = tk.getPageCount();
+                let currentPage = 1;
+                let nextGlissNumber = 1;
+                const dynamicGlissIds = new Set();
+                let nextHarmNumber = 1;
+                const dynamicHarmIds = new Set();
+                let refreshScheduled = false;
+
+                function scheduleRefresh() {
+                    if (refreshScheduled) return;
+                    refreshScheduled = true;
+                    queueMicrotask(() => {
+                        refreshScheduled = false;
+                        if (!tk.loadData(mei)) {
+                            console.error(tk.getLog());
+                            return;
+                        }
+                        pageCount = tk.getPageCount();
+                        renderPage(currentPage);
+                    });
+                }
+
+                function addGliss(startId, endId) {
+                    const startRef = startId.replace(/^#/, "");
+                    const endRef = endId.replace(/^#/, "");
+                    const parser = new DOMParser();
+                    const document = parser.parseFromString(mei, "application/xml");
+                    const findByXmlId = id => [...document.getElementsByTagName("*")]
+                        .find(el => el.getAttribute("xml:id") === id);
+                    const start = findByXmlId(startRef);
+                    const end = findByXmlId(endRef);
+                    if (!start || !end) {
+                        console.error(`Cannot add gliss: source notes not found (${startId}, ${endId}).`);
+                        return;
+                    }
+                    const measure = start.closest("measure");
+                    if (!measure) {
+                        console.error(`Cannot add gliss: start note is not inside a measure (${startId}).`);
+                        return;
+                    }
+                    const existingGliss = [...document.getElementsByTagName("gliss")]
+                        .find(gliss =>
+                            gliss.getAttribute("startid") === `#${startRef}` &&
+                            gliss.getAttribute("endid") === `#${endRef}`);
+                    if (existingGliss) return;
+
+                    const gliss = document.createElementNS(
+                        "http://www.music-encoding.org/ns/mei",
+                        "gliss"
+                    );
+                    let glissId;
+                    do {
+                        glissId = `gliss${nextGlissNumber++}`;
+                    } while (findByXmlId(glissId));
+                    gliss.setAttribute("xml:id", glissId);
+                    gliss.setAttribute("startid", `#${startRef}`);
+                    gliss.setAttribute("endid", `#${endRef}`);
+                    gliss.setAttribute("color" , "red");
+                    measure.insertBefore(gliss, measure.querySelector("reh"));
+                    dynamicGlissIds.add(glissId);
+
+                    mei = new XMLSerializer().serializeToString(document);
+                    scheduleRefresh();
+                }
+
+                function addHarm(text, targetId) {
+                    const targetRef = targetId.replace(/^#/, "");
+                    const parser = new DOMParser();
+                    const document = parser.parseFromString(mei, "application/xml");
+                    const findByXmlId = id => [...document.getElementsByTagName("*")]
+                        .find(el => el.getAttribute("xml:id") === id);
+                    const target = findByXmlId(targetRef);
+                    if (!target) {
+                        console.error(`Cannot add harm: target note not found (${targetId}).`);
+                        return;
+                    }
+                    const measure = target.closest("measure");
+                    if (!measure) {
+                        console.error(`Cannot add harm: target note is not inside a measure (${targetId}).`);
+                        return;
+                    }
+                    const existingHarm = [...document.getElementsByTagName("harm")]
+                        .find(harm =>
+                            harm.getAttribute("startid") === `#${targetRef}` &&
+                            harm.textContent === text);
+                    if (existingHarm) return;
+
+                    let harmId;
+                    do {
+                        harmId = `harm${nextHarmNumber++}`;
+                    } while (findByXmlId(harmId));
+
+                    const harm = document.createElementNS(
+                        "http://www.music-encoding.org/ns/mei",
+                        "harm"
+                    );
+                    harm.setAttribute("xml:id", harmId);
+                    harm.setAttribute("startid", `#${targetRef}`);
+                    harm.setAttribute("place", "below");
+                    harm.setAttribute("vo", "-4");
+                    harm.setAttribute("ho", "-1");
+                    harm.setAttribute("color", "red");
+                    harm.textContent = text;
+                    measure.insertBefore(harm, measure.querySelector("reh"));
+                    dynamicHarmIds.add(harmId);
+
+                    mei = new XMLSerializer().serializeToString(document);
+                    scheduleRefresh();
+                }
+
+                cancelDynamicGliss = () => {
+                    const parser = new DOMParser();
+                    const document = parser.parseFromString(mei, "application/xml");
+                    let removed = false;
+
+                    for (const annotation of [...document.getElementsByTagName("*")]) {
+                        const annotationId = annotation.getAttribute("xml:id") || "";
+                        if (/^(?:gliss|harm)\d+$/.test(annotationId)) {
+                            annotation.remove();
+                            removed = true;
+                        }
+                    }
+                    dynamicGlissIds.clear();
+                    dynamicHarmIds.clear();
+                    if (!removed) return;
+
+                    mei = new XMLSerializer().serializeToString(document);
+                    if (!tk.loadData(mei)) {
+                        console.error(tk.getLog());
+                        return;
+                    }
+                    pageCount = tk.getPageCount();
+                    renderPage(currentPage);
+                };
+
+                function renderPage(n) {
+                    currentPage = Math.min(Math.max(n, 1), pageCount);
+                    container.innerHTML = tk.renderToSVG(currentPage, {});
+                    container.querySelectorAll("g.reh").forEach(g => {
+                        g.setAttribute("transform", "translate(0, -300)");
+                    });
+                    applySelection(container);
+                    setClass(container, highlightedNoteIds, "note-focus", true);
+                    pageLabel.textContent = `Page ${currentPage} / ${pageCount}`;
+                    prevBtn.disabled = currentPage <= 1;
+                    nextBtn.disabled = currentPage >= pageCount;
+                }
+
+                prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
+                nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
+
+                // ---- delegated listeners ----
+                container.addEventListener("click", (e) => {
+                    const clickedEl = e.target.closest("g.note, g.reh");
+                    const group = clickedEl ? (idToGroup[clickedEl.id] ?? null) : null;
+
+                    // Clicking empty space dismisses the strip; notes and rehearsal marks remain selectable.
+                    if (group !== selectedGroup) {
+                        cancelDynamicGliss?.();
+                        clearNoteHighlights(container);
+                    }
+                    selectedGroup = group;
+                    selectedElementId = clickedEl?.id ?? null;
+                    applySelection(container);
+                    updateAside(group, clickedEl);
+
+                    if (clickedEl) {
+                        onNoteClick(clickedEl.id, group, e, container, {
+                            addGliss,
+                            addHarm,
+                            highlightNotes: (...ids) => highlightNotes(container, ...ids),
+                        });
+                    }
+                });
+
+                container.addEventListener("mouseover", (e) => {
+                    const noteEl = e.target.closest("g.note");
+                    container.querySelectorAll(".hl").forEach(el => el.classList.remove("hl"));
+                    if (!noteEl) return;
+                    const group = idToGroup[noteEl.id];
+                    setClass(container, group ? groups[group] : [noteEl.id], "hl", true);
+                });
+
+                container.addEventListener("mouseleave", () => {
+                    container.querySelectorAll(".hl").forEach(el => el.classList.remove("hl"));
+                });
+
+                // close button (delegated, since the strip's contents are rebuilt)
+                aside.addEventListener("click", (e) => {
+                    if (e.target.id === "infoClose") clearSelection(container);
+                });
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") clearSelection(container);
+                });
+
+                renderPage(1);
+            }
+
+            try {
+                await setupExample("sOctet.mei", "notation1");
+            } catch (e) {
+                console.error("Setup failed:", e);
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div id="nav">
+        <button id="prev">&#9664; Prev</button>
+        <span id="pageLabel"></span>
+        <button id="next">Next &#9654;</button>
+    </div>
+    <div id="notation1"></div>
+    <aside id="info" hidden></aside>
+</body>
+
+</html>
