@@ -159,6 +159,23 @@
             margin: 2px 6px 2px 0;
         }
 
+        #info .harmonic-render {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #ccc;
+        }
+
+        #info .harmonic-render h3 {
+            margin: 0 0 4px;
+            font-size: 0.9em;
+        }
+
+        #info .harmonic-render-score svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
         #videoInfo {
             position: fixed;
             right: 12px;
@@ -293,6 +310,7 @@
             reh3: ["reh3"],
             reh4: ["reh4"],
             reh5: ["reh5"],
+            reh6: ["reh6"]
         };
 
         const groupInfo = {
@@ -343,6 +361,9 @@
             },
             reh5: {
                 description: "Due to the way Stravinsky sets up his ostinato, we actually get the same characteristic tritone between C and F# even though the melody starts a bar late.",
+            },
+            reh6: {
+                description: "The counterpoint is remarkably consonant here, one of the few times that voices are actually moving at the same pace.",
             }
         };
 
@@ -478,7 +499,7 @@
         function onbassoonmel2Click(noteId, event, container, actions) {
             actions.addHarm("!", "n1eizeh7", "above");
             actions.addHarm("!", "n1ej063c", "above");
-         }
+        }
         function onBassoonmel3Click(noteId, event) { }
         function onReh1Click(noteId, event, container, actions) {
             actions.addGliss("n5qy8nc", "nrvlpmm");
@@ -521,6 +542,52 @@
         function onReh5Click(noteId, event, container, actions) {
             actions.highlightNotes(["n1a82ir9", "n1m905qn", "nryu3c", "nvm868a", "n1440oyx", "nj8gt95", "nie3ge6"]);
         }
+        function onReh6Click(noteId, event, container, actions) {
+            actions.highlightNotes([
+                "nml8hdz",
+                "n19cg4hv",
+                "beam61",
+                "nh69dd0",
+                "n105wh94",
+                "ng6uxya",
+                "n136ouu5",
+                "beam62",
+                "n1grah2f",
+                "nexzuyr",
+                "nxo6lwc",
+                "n1ey6fu4",
+                "beam65",
+                "n8p2xd7",
+                "n3sfqry",
+                "beam68",
+                "nbmmos1",
+                "n1oighw",
+                "ntjzc9f",
+                "n1h1zfnh",
+                "beam69",
+                "nk7v9v",
+                "n1t9vrrm",
+                "n10dp7t6",
+                "n11cf55k",
+                "n2spi6g",
+                "niwserq",
+                "n1z0rsyb",
+                "nygexzh",
+                "n1ey6fu4",
+                "npirkfv",
+                "n1wt8zvg",
+                "n196qvao",
+                "n4ohfr5",
+                "nxiw8yw",
+                "n1pbph42",
+
+            ]);
+            actions.addHarm("3", "nml8hdz", "below", "0");
+            actions.addHarm("3", "nxo6lwc", "below", "-3");
+            actions.addHarm("3", "n8p2xd7", "below", "0");
+            actions.addHarm("3", "n10dp7t6", "below", "-3");
+            actions.renderDyads();
+        }
 
         const groupClickHandlers = {
             bassoonbass: onBassoonbassClick,
@@ -537,7 +604,8 @@
             reh2: onReh2Click,
             reh3: onReh3Click,
             reh4: onReh4Click,
-            reh5: onReh5Click
+            reh5: onReh5Click,
+            reh6: onReh6Click
         };
 
         function onNoteClick(noteId, groupName, event, container, actions) {
@@ -684,7 +752,7 @@
                     scheduleRefresh();
                 }
 
-                function addHarm(text, targetId, placement = "below") {
+                function addHarm(text, targetId, placement = "below", verticalOffset) {
                     if (placement !== "above" && placement !== "below") {
                         console.error(`Cannot add harm: placement must be "above" or "below" (received "${placement}").`);
                         return;
@@ -723,7 +791,10 @@
                     harm.setAttribute("xml:id", harmId);
                     harm.setAttribute("startid", `#${targetRef}`);
                     harm.setAttribute("place", placement);
-                    harm.setAttribute("vo", placement === "above" ? "3" : "-4");
+                    harm.setAttribute(
+                        "vo",
+                        verticalOffset ?? (placement === "above" ? "3" : "-4")
+                    );
                     harm.setAttribute("ho", "-1");
                     harm.setAttribute("color", "red");
                     harm.textContent = text;
@@ -732,6 +803,77 @@
 
                     mei = new XMLSerializer().serializeToString(document);
                     scheduleRefresh();
+                }
+
+                function renderDyads() {
+                    const aside = document.getElementById("info");
+                    const renderContainer = document.createElement("div");
+                    renderContainer.className = "harmonic-render";
+                    renderContainer.innerHTML = `
+                        <div class="harmonic-render-score"></div>
+                    `;
+
+                    const dyadMei = `
+                        <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+                            <music>
+                                <body>
+                                    <mdiv>
+                                        <score>
+                                            <scoreDef>
+                                                <staffGrp>
+                                                    <staffDef n="1" lines="5">
+                                                        <clef shape="G" line="2"/>
+                                                    </staffDef>
+                                                </staffGrp>
+                                            </scoreDef>
+                                            <section>
+                                                <measure n="1">
+                                            <staff n="1">
+                                                <layer n="1">
+                                                    <note dur="4" pname="b" oct="4"/>
+                                                    <note dur="4" pname="a" oct="4"/>
+                                                    <note dur="4" pname="g" oct="4">
+                                                        <accid accid="s"/>
+                                                    </note>
+                                                    <note dur="4" pname="g" oct="4">
+                                                        <accid accid="n"/>
+                                                    </note>
+                                                    <note dur="4" pname="f" oct="4" accid="s"/>
+                                                </layer>
+                                                <layer n="2">
+                                                    <note dur="4" pname="g" oct="4"/>
+                                                    <note dur="4" pname="f" oct="4"/>
+                                                    <note dur="4" pname="e" oct="4"/>
+                                                    <note dur="4" pname="e" oct="4"/>
+                                                    <note dur="4" pname="d" oct="4"/>
+                                                </layer>
+                                            </staff>
+                                                </measure>
+                                            </section>
+                                        </score>
+                                    </mdiv>
+                                </body>
+                            </music>
+                        </mei>
+                    `;
+                    const dyadToolkit = new verovio.toolkit();
+                    dyadToolkit.setOptions({
+                        scale: 40,
+                        pageWidth: 900,
+                        pageHeight: 500,
+                        pageMarginTop: 20,
+                        pageMarginBottom: 20,
+                        footer: "none",
+                        adjustPageHeight: true,
+                        adjustPageWidth: true
+                    });
+                    if (!dyadToolkit.loadData(dyadMei)) {
+                        console.error(dyadToolkit.getLog());
+                        return;
+                    }
+                    renderContainer.querySelector(".harmonic-render-score").innerHTML =
+                        dyadToolkit.renderToSVG(1, {});
+                    aside.append(renderContainer);
                 }
 
                 cancelDynamicGliss = () => {
@@ -794,6 +936,7 @@
                         onNoteClick(clickedEl.id, group, e, container, {
                             addGliss,
                             addHarm,
+                            renderDyads,
                             highlightNotes: (...ids) => highlightNotes(container, ...ids),
                         });
                     }
@@ -840,11 +983,7 @@
     <div id="notation1"></div>
     <aside id="info" hidden></aside>
     <aside id="videoInfo">
-        <iframe
-            class="video"
-            src="https://www.youtube.com/embed/GC6CpS7OPow"
-            title="Performance video"
-            loading="lazy"
+        <iframe class="video" src="https://www.youtube.com/embed/GC6CpS7OPow" title="Performance video" loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen></iframe>
     </aside>

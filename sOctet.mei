@@ -583,6 +583,9 @@
                            </beam>
                         </layer>
                      </staff>
+                     <reh xml:id="reh6" tstamp="2.5" staff="1" place="above">
+                        <rend color="orange">(⌐■_■)</rend>
+                     </reh>
                      <staff xml:id="m16s2" n="2">
                         <layer xml:id="m16s2l1" n="1">
                            <beam xml:id="beam57">
@@ -960,6 +963,7 @@
                            <note xml:id="njrvvu2" dur="8" pname="e" oct="4" />
                         </layer>
                      </staff>
+                     <tie startid="#njrvvu2" endid="#n1gzo1pv" />
                      <staff xml:id="m26s3" n="3">
                         <layer xml:id="m26s3l1" n="1">
                            <beam xml:id="beam98">
@@ -1037,6 +1041,7 @@
                            <note xml:id="n9m6gr5" dur="8" pname="g" oct="4" />
                         </layer>
                      </staff>
+                     <tie startid="#n9m6gr5" endid="#n1yucmkr" />
                      <staff xml:id="m28s3" n="3">
                         <layer xml:id="m28s3l1" n="1">
                            <beam xml:id="beam107">
