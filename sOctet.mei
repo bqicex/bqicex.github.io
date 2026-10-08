@@ -912,6 +912,9 @@
                            </beam>
                         </layer>
                      </staff>
+                     <reh xml:id="reh7" tstamp="2.0" staff="1" place="above">
+                        <rend color="orange">(⌐■_■)</rend>
+                     </reh>
                      <staff xml:id="m25s2" n="2">
                         <layer xml:id="m25s2l1" n="1">
                            <beam xml:id="beam93">

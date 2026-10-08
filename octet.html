@@ -176,6 +176,18 @@
             height: auto;
         }
 
+        #info .image-render {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #ccc;
+        }
+
+        #info .image-render img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
         #videoInfo {
             position: fixed;
             right: 12px;
@@ -310,7 +322,14 @@
             reh3: ["reh3"],
             reh4: ["reh4"],
             reh5: ["reh5"],
-            reh6: ["reh6"]
+            reh6: ["reh6"],
+            reh7: ["reh7"],
+            octcad: [
+                "beam135", "n1d5bbeh", "n1jakwm8", "n11gvjkt",
+                "beam136", "n1wz1dj9", "natkhj5", "nmelgzi", "n1cgt7je",
+                "beam137", "nxnt1vp", "njt7u2o", "nvu5i0v",
+                "beam138", "nsr769n", "nqa4g8f", "n1o9rsce", "nebj0rw"
+            ]
         };
 
         const groupInfo = {
@@ -364,6 +383,12 @@
             },
             reh6: {
                 description: "The counterpoint is remarkably consonant here, one of the few times that voices are actually moving at the same pace.",
+            },
+            reh7: {
+                description: "Much like the earlier contrapunctal passage, the clarinet and bassoon engage in parallel ascending motion. The overall contrapunctal structure suggests a series of suspensions. Note also the 2:1 interval pacing between clarinet and ostinato. Note the similarity between this passage and something that could be found in Corelli.",
+            },
+            octcad: {
+                description: "A shift into the diminished/octatonic world for the cadential gesture."
             }
         };
 
@@ -541,9 +566,40 @@
         }
         function onReh5Click(noteId, event, container, actions) {
             actions.highlightNotes(["n1a82ir9", "n1m905qn", "nryu3c", "nvm868a", "n1440oyx", "nj8gt95", "nie3ge6"]);
+            actions.addHarm("!!!", "nj8gt95");
         }
+        function onReh7Click(noteId, event, container, actions) {
+            actions.highlightNotes([
+                "beam92", "ngfh6ku", "n13fecec",
+                "n5t2xfz",
+                "beam96", "n1pbr7rn", "noc9y23", "n1ikcsr5", "n1yqdnro",
+                "beam97", "n1k1ex2u", "nty0ffe", "nqdtnwv",
+                "n99oro1", "njrvvu2",
+                "beam100", "n1quydur", "n1ezq8bj", "n1ds914q", "n13n9a2o",
+                "beam101", "nf1ng4m", "n6hlyj9", "n1wh5krv",
+                "beam102", "n1gzo1pv", "n1ou961u", "n1i85jsg", "n1evewbd",
+                "n12lfedv", "n10u74sw",
+                "beam105", "ntbgws8", "nork2j8", "n37kpvi", "n1jviia2",
+                "beam106", "n1dgztty", "n2s4cd4",
+                "n4zux0j", "n9m6gr5", "ngxakwm", "n1lmpk1n"
+            ]);
+
+            actions.addHarm("2", "ngfh6ku", "below", "0");
+            actions.addHarm("3", "n13fecec", "below", "0");
+            actions.addHarm("2", "nty0ffe", "below", "0");
+            actions.addHarm("3", "nqdtnwv", "below", "0");
+            actions.addHarm("2", "n6hlyj9", "below", "0");
+            actions.addHarm("3", "n1wh5krv", "below", "0");
+            actions.addHarm("2", "n2s4cd4", "below", "0");
+            actions.addHarm("3", "n1n0pn4z", "below", "0");
+            actions.renderDyadstwo();
+            actions.renderImage();
+        }
+
         function onReh6Click(noteId, event, container, actions) {
             actions.highlightNotes([
+                "n1uabnm3",
+                "n1r4d61b",
                 "nml8hdz",
                 "n19cg4hv",
                 "beam61",
@@ -580,7 +636,6 @@
                 "n4ohfr5",
                 "nxiw8yw",
                 "n1pbph42",
-
             ]);
             actions.addHarm("3", "nml8hdz", "below", "0");
             actions.addHarm("3", "nxo6lwc", "below", "-3");
@@ -588,6 +643,7 @@
             actions.addHarm("3", "n10dp7t6", "below", "-3");
             actions.renderDyads();
         }
+
 
         const groupClickHandlers = {
             bassoonbass: onBassoonbassClick,
@@ -605,7 +661,8 @@
             reh3: onReh3Click,
             reh4: onReh4Click,
             reh5: onReh5Click,
-            reh6: onReh6Click
+            reh6: onReh6Click,
+            reh7: onReh7Click,
         };
 
         function onNoteClick(noteId, groupName, event, container, actions) {
@@ -668,7 +725,7 @@
                 adjustPageHeight: false,
                 breaks: "auto",
                 minLastJustification: 0.8,
-                spacingSystem: 12,
+                spacingSystem: 20,
                 footer: "none",
                 systemDivider: "none"
             };
@@ -805,6 +862,7 @@
                     scheduleRefresh();
                 }
 
+
                 function renderDyads() {
                     const aside = document.getElementById("info");
                     const renderContainer = document.createElement("div");
@@ -875,6 +933,114 @@
                         dyadToolkit.renderToSVG(1, {});
                     aside.append(renderContainer);
                 }
+                function renderDyadstwo() {
+                    const aside = document.getElementById("info");
+                    const renderContainer = document.createElement("div");
+                    renderContainer.className = "harmonic-render";
+                    renderContainer.innerHTML = `
+                        <div class="harmonic-render-score"></div>
+                    `;
+
+                    const dyadMei = `
+                        <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+                            <music>
+                                <body>
+                                    <mdiv>
+                                        <score>
+                                            <scoreDef>
+                                                <staffGrp>
+                                                    <staffDef n="1" lines="5">
+                                                        <clef shape="F" line="4"/>
+                                                    </staffDef>
+                                                </staffGrp>
+                                            </scoreDef>
+                                            <section>
+                                                <measure n="1">
+                                            <staff n="1">
+                                                <layer n="1">
+                                                    <note xml:id="note1" dur="2" pname="d" oct="4"/>
+                                                    <note xml:id="note2" dur="2" pname="e" oct="4"/>
+                                                    <note xml:id="note3" dur="2" pname="f" oct="4">
+                                                    </note>
+                                                    <note xml:id="note4" dur="2" pname="g" oct="4">
+                                                    </note>
+                                                    <note xml:id="note5" dur="2" pname="f" oct="4" accid="s"/>
+                                                </layer>
+                                                <layer n="2">
+                                                    <beam>
+                                                        <note xml:id="note6" dur="4" pname="c" oct="4"/>
+                                                        <note xml:id="note7" dur="8" pname="b" oct="3"/>
+                                                        <note xml:id="note8" dur="8" pname="d" oct="4"/>
+                                                    </beam>
+                                                    <beam>
+                                                        <note xml:id="note9" dur="4" pname="d" oct="4"/>
+                                                        <note xml:id="note10" dur="8" pname="c" oct="4"/>
+                                                        <note xml:id="note11" dur="8" pname="e" oct="4"/>
+                                                    </beam>
+                                                    <beam>
+                                                        <note xml:id="note12" dur="4" pname="e" oct="4"/>
+                                                        <note xml:id="note13" dur="8" pname="d" oct="4"/>
+                                                        <note xml:id="note14" dur="8" pname="f" oct="4"/>
+                                                    </beam>
+                                                    <beam>
+                                                        <note xml:id="note15" dur="4" pname="f" oct="4"/>
+                                                        <note xml:id="note16" dur="4" pname="e" oct="4"/>
+                                                    </beam>
+                                                    <note xml:id="note17" dur="2" pname="d" oct="4"/>
+                                                </layer>
+                                            </staff>
+                                            <harm place="below" startid="note6" color="red">2</harm>
+                                            <harm place="below" startid="note7" color="red">3</harm>
+                                            <harm place="below" startid="note8" color="red">1</harm>
+                                            <harm place="below" startid="note9" color="red">2</harm>
+                                            <harm place="below" startid="note10" color="red">3</harm>
+                                            <harm place="below" startid="note11" color="red">1</harm>
+                                            <harm place="below" startid="note12" color="red">2</harm>
+                                            <harm place="below" startid="note13" color="red">3</harm>
+                                            <harm place="below" startid="note14" color="red">1</harm>
+                                            <harm place="below" startid="note15" color="red">2</harm>
+                                            <harm place="below" startid="note16" color="red">3</harm>
+                                            <harm place="below" startid="note17" color="red">3</harm>
+                                            <tie startid="note8" endid="note9"/>
+                                            <tie startid="note11" endid="note12"/>
+                                            <tie startid="note14" endid="note15"/>
+                                                </measure>
+                                            </section>
+                                        </score>
+                                    </mdiv>
+                                </body>
+                            </music>
+                        </mei>
+                    `;
+                    const dyadToolkit = new verovio.toolkit();
+                    dyadToolkit.setOptions({
+                        scale: 40,
+                        pageWidth: 900,
+                        pageHeight: 500,
+                        pageMarginTop: 20,
+                        pageMarginBottom: 20,
+                        footer: "none",
+                        adjustPageHeight: true,
+                        adjustPageWidth: true
+                    });
+                    if (!dyadToolkit.loadData(dyadMei)) {
+                        console.error(dyadToolkit.getLog());
+                        return;
+                    }
+                    renderContainer.querySelector(".harmonic-render-score").innerHTML =
+                        dyadToolkit.renderToSVG(1, {});
+                    aside.append(renderContainer);
+                }
+
+                function renderImage() {
+                    const aside = document.getElementById("info");
+                    const renderContainer = document.createElement("div");
+                    renderContainer.className = "image-render";
+                    renderContainer.innerHTML = `
+                        <img src="corelli.png" alt="Meowmeow">
+                    `;
+                    aside.append(renderContainer);
+                }
 
                 cancelDynamicGliss = () => {
                     const parser = new DOMParser();
@@ -937,6 +1103,8 @@
                             addGliss,
                             addHarm,
                             renderDyads,
+                            renderDyadstwo,
+                            renderImage,
                             highlightNotes: (...ids) => highlightNotes(container, ...ids),
                         });
                     }
