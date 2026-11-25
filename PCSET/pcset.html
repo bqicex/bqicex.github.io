@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PC Set - Piano</title>
+    <script src="fft.js"></script>
     <style>
         body {
             margin: 0;
@@ -17,7 +18,7 @@
         }
 
         main {
-            width: min(46vw, 380px);
+            width: min(92vw, 900px);
             text-align: center;
         }
 
@@ -27,7 +28,7 @@
         }
 
         #piano {
-            width: 100%;
+            width: min(100%, 380px);
             height: auto;
             user-select: none;
         }
@@ -49,7 +50,7 @@
         }
 
         .white-key.selected {
-            fill: #ff0000;
+            fill: #ff73f8;
         }
 
         .black-key {
@@ -63,7 +64,7 @@
         }
 
         .black-key.selected {
-            fill: #ff0000;
+            fill: #ff73f8;
         }
 
         .key-label {
@@ -73,11 +74,94 @@
         }
 
         #key-info {
-            width: 100%;
-            margin: 1rem 0 0;
+            width: min(100%, 380px);
+            margin: 1rem auto 0;
             border-collapse: collapse;
             border: none;
             table-layout: fixed;
+        }
+
+        .piano-dft-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+            gap: 0.75rem;
+            align-items: start;
+            text-align: left;
+        }
+
+        .piano-controls {
+            text-align: center;
+        }
+
+        #pcset-info {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        #pcset-info th,
+        #pcset-info td {
+            border: none;
+            padding: 0.25rem 0.5rem;
+        }
+
+        #pcset-info th {
+            width: 255px;
+            text-align: left;
+            font-weight: normal;
+        }
+
+        #pcset-info td {
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        #dft {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        #dft th,
+        #dft td {
+            border: 2px solid #000000;
+            padding: 0.25rem 0.5rem;
+        }
+
+        #dft th {
+            width: 105px;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        #dft-help {
+            margin-left: 0.25rem;
+            padding: 0 0.35rem;
+            border: 1px solid #777;
+            border-radius: 50%;
+            background: #fff;
+            color: #252525;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        #dft-help-dialog {
+            width: min(80vw, 32rem);
+            border: 1px solid #777;
+            border-radius: 6px;
+            padding: 1rem;
+            color: #252525;
+            font: inherit;
+        }
+
+        #dft-help-dialog::backdrop {
+            background: rgb(0 0 0 / 40%);
+        }
+
+        #dft td {
+            text-align: center;
+            overflow-wrap: anywhere;
         }
 
         #key-info th,
@@ -96,6 +180,7 @@
 
         #key-info td {
             text-align: left;
+            overflow-wrap: anywhere;
         }
 
         #reset {
@@ -131,7 +216,9 @@
 <body>
     <main>
         <h1>(◞‸◟；) Rest in Peace, Mt Allison Calculator (◞‸◟；)</h1>
-        <svg id="piano" viewBox="0 0 700 300" role="group" aria-label="Piano keyboard, C4 to C5">
+        <div class="piano-dft-grid">
+            <div class="piano-controls">
+                <svg id="piano" viewBox="0 0 700 300" role="group" aria-label="Piano keyboard, C4 to C5">
             <g id="white-keys">
                 <rect class="white-key" data-note="C" x="0" y="0" width="80" height="300" rx="3" tabindex="0"
                     role="button" aria-label="C4" aria-pressed="false" />
@@ -160,22 +247,48 @@
                 <rect class="black-key" data-note="A#" x="450" y="0" width="56" height="190" rx="3" tabindex="0"
                     role="button" aria-label="A sharp 4" aria-pressed="false" />
             </g>
-        </svg>
-        <table id="key-info" aria-label="Selected piano keys">
-            <tbody>
-                <tr>
-                    <th scope="row">Letter notes:</th>
-                    <td id="status">none</td>
-                </tr>
-                <tr>
-                    <th scope="row">PCs:</th>
-                    <td id="pcs">none</td>
-                </tr>
-            </tbody>
-        </table>
-        <button id="reset" type="button">Reset</button>
-        <button id="calculate" type="button">Calculate</button>
-        <br><br>
+                </svg>
+                <table id="key-info" aria-label="Selected piano keys">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Letter notes:</th>
+                            <td id="status">none</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">PCs:</th>
+                            <td id="pcs">none</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button id="reset" type="button">Reset</button>
+                <button id="calculate" type="button">Calculate</button>
+            </div>
+            <table id="dft">
+                <tbody>
+                    <tr>
+                        <th scope="row">DFT:
+                            <button id="dft-help" type="button" aria-label="Open DFT notes">?</button>
+                        </th>
+                        <td>f1</td>
+                        <td>f2</td>
+                        <td>f3</td>
+                        <td>f4</td>
+                        <td>f5</td>
+                        <td>f6</td>
+                    </tr>
+                    <tr id="abs-values">
+                        <th scope="row">Absolute Values:</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr></tr>
+                </tbody>
+            </table>
+        </div>
         <table id="pcset-info">
             <tbody>
                 <tr>
@@ -204,6 +317,17 @@
                 </tr>
             </tbody>
         </table>
+        <dialog id="dft-help-dialog" aria-labelledby="dft-help-title">
+            <h2 id="dft-help-title">DFT</h2>
+            <p><b>uwu What's this?</b></p>
+            <p>The table shows the first six fourier coefficients for the selected pitch-class set, including both
+                magnitude and phase. Each coefficient corresopnd roughly to a "harmonic quality" that is familiar to
+                listeners of Western music. See <a href="https://www.jstor.org/stable/25164642">Quinn 2007</a>, <a
+                    href="https://doi.org/10.1215/00222909-2863409">Yust 2015</a>, <a
+                    href="https://mtosmt.org/issues/mto.21.27.3/mto.21.27.3.chiu.html">Chiu 2021</a> for more
+                information.</p>
+            <button id="close-dft-help" type="button">Close</button>
+        </dialog>
         <p>Other planned features: Interval Vectors, pc properties, DFT, other labels</p>
     </main>
 
@@ -438,6 +562,13 @@
             "0,1,2,3,4,5,6,7,8,9,10,11": "12-1",
             "0,1,2,3,4,5,6,7,8,9,10": "11-1",
         };
+        const dftHelpDialog = document.querySelector("#dft-help-dialog");
+        document.querySelector("#dft-help").addEventListener("click", () => {
+            dftHelpDialog.showModal();
+        });
+        document.querySelector("#close-dft-help").addEventListener("click", () => {
+            dftHelpDialog.close();
+        });
         const status = document.querySelector("#status");
         const storedKeys = new Set();
         let storedKeyCount = 0;
@@ -510,7 +641,7 @@
             const maxpc = Math.max(...primeform);
             const inverted = primeform.map(pc => (maxpc - pc)).sort((a, b) => a - b);
             // Compare primeform against inverted
-            if (inverted[1]-inverted[0] < primeform[1]-primeform[0]) {
+            if (inverted[1] - inverted[0] < primeform[1] - primeform[0]) {
                 return inverted.join(", ");
             } else {
                 return primeform.join(", ");
@@ -572,6 +703,9 @@
                 document.querySelector("#prime-form").textContent = "none";
                 document.querySelector("#prime-form-tni").textContent = "none";
                 document.querySelector("#forte-name").textContent = "none";
+                document.querySelectorAll("#abs-values td").forEach((cell) => {
+                    cell.textContent = "";
+                });
             });
             updateStoredKeys();
             updatePCS();
@@ -588,6 +722,10 @@
             const primeFormTnI = calculatePrimeFormCheckInvert(normalFormarray);
             document.querySelector("#prime-form-tni").textContent = primeFormTnI;
             document.querySelector("#forte-name").textContent = findForteName(pcs);
+            const absoluteValues = abs(transform(pcs));
+            document.querySelectorAll("#abs-values td").forEach((cell, index) => {
+                cell.textContent = absoluteValues[index] ?? "";
+            });
         });
 
         updateStoredKeys();
