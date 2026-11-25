@@ -210,6 +210,16 @@
         #calculate:hover {
             background: #e7edf8;
         }
+
+        @media (max-width: 700px) {
+            .piano-dft-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .piano-dft-grid > * {
+                min-width: 0;
+            }
+        }
     </style>
 </head>
 
@@ -322,9 +332,9 @@
             <p><b>uwu What's this?</b></p>
             <p>The table shows the first six fourier coefficients for the selected pitch-class set, including both
                 magnitude and phase. Each coefficient corresopnd roughly to a "harmonic quality" that is familiar to
-                listeners of Western music. See <a href="https://www.jstor.org/stable/25164642">Quinn 2007</a>, <a
-                    href="https://doi.org/10.1215/00222909-2863409">Yust 2015</a>, <a
-                    href="https://mtosmt.org/issues/mto.21.27.3/mto.21.27.3.chiu.html">Chiu 2021</a> for more
+                listeners of Western music. See <a href="https://www.jstor.org/stable/25164642" target="_blank" rel="noopener noreferrer">Quinn 2007</a>, <a
+                    href="https://doi.org/10.1215/00222909-2863409" target="_blank" rel="noopener noreferrer">Yust 2015</a>, <a
+                    href="https://mtosmt.org/issues/mto.21.27.3/mto.21.27.3.chiu.html" target="_blank" rel="noopener noreferrer">Chiu 2021</a> for more
                 information.</p>
             <button id="close-dft-help" type="button">Close</button>
         </dialog>
